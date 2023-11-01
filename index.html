@@ -18,11 +18,16 @@
   }
   canvas {
     border: 1px solid white;
-    display: none; /* Hide the canvas initially */
+    display: none;
   }
   #menu {
     display: block;
     text-align: center;
+    background-image: url('background.png');
+    background-size: 100%;
+    background-repeat: no-repeat;
+    background-position: center;
+    padding: 20px;
   }
   #name-input {
     margin-bottom: 10px;
@@ -34,10 +39,6 @@
     padding: 10px 20px;
     border: none;
     cursor: pointer;
-  }
-  #score {
-    color: white;
-    font-size: 24px;
   }
   #top-scores {
     color: white;
@@ -58,11 +59,10 @@
 <body>
 <canvas id="game"></canvas>
 <div id="menu">
-  <h2>Welcome to Snake Game</h2>
+  <h2>Snake Game</h2>
   <input type="text" id="name-input" placeholder="Enter your name">
   <button id="start-button">Start Game</button>
 </div>
-<div id="score">Score: 0</div>
 <div id="top-scores">Top Scores:</div>
 <button id="restart-button" style="display: none">Restart</button>
 <script>
@@ -71,7 +71,6 @@ var context = canvas.getContext('2d');
 var menuElement = document.getElementById('menu');
 var nameInput = document.getElementById('name-input');
 var startButton = document.getElementById('start-button');
-var scoreElement = document.getElementById('score');
 var topScoresElement = document.getElementById('top-scores');
 var restartButton = document.getElementById('restart-button');
 
@@ -121,7 +120,6 @@ function gameOver() {
   restartButton.addEventListener('click', () => {
     restartButton.style.display = 'none';
     score = 0;
-    scoreElement.textContent = 'Score: 0';
     topScoresElement.style.display = 'none';
     snake.x = 160;
     snake.y = 160;
@@ -192,7 +190,6 @@ function loop() {
       apple.x = getRandomInt(0, canvas.width / grid) * grid;
       apple.y = getRandomInt(0, canvas.height / grid) * grid;
       score += 10;
-      scoreElement.textContent = 'Score: ' + score;
     }
 
     for (var i = index + 1; i < snake.cells.length; i++) {
