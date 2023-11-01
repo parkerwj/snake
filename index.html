@@ -57,6 +57,10 @@
   </style>
 </head>
 <body>
+  <audio id="bg-music" autoplay loop preload="auto">
+    <source src="background.mp3" type="audio/mpeg">
+    Your browser does not support the audio element.
+  </audio>
 <canvas id="game"></canvas>
 <div id="menu">
   <h2>Snake Game</h2>
@@ -134,16 +138,17 @@ function gameOver() {
 }
 
 function startGame() {
-  var name = nameInput.value;
-  if (name.trim() === '') {
-    alert('Please enter your name.');
-  } else {
-    nameInput.style.display = 'none';
-    startButton.style.display = 'none';
-    menuElement.style.display = 'none';
-    canvas.style.display = 'block';
+    var name = document.getElementById('name-input').value;
+    if (name.trim() === '') {
+      alert('Please enter your name.');
+    } else {
+      document.getElementById('name-input').style.display = 'none';
+      document.getElementById('start-button').style.display = 'none';
+      document.getElementById('menu').style.display = 'none';
+      document.getElementById('bg-music').play(); // Start playing the music
+      document.getElementById('game').style.display = 'block';
+    }
   }
-}
 
 startButton.addEventListener('click', startGame);
 
