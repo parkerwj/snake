@@ -24,7 +24,7 @@
     display: block;
     text-align: center;
     background-image: url('background.png');
-    background-size: 100%;
+    background-size: cover;
     background-repeat: no-repeat;
     background-position: center;
     padding: 20px;
@@ -57,19 +57,16 @@
   </style>
 </head>
 <body>
-  <audio id="bg-music" autoplay loop preload="auto">
-    <source src="background.mp3" type="audio/mpeg">
-    Your browser does not support the audio element.
-  </audio>
 <canvas id="game"></canvas>
 <div id="menu">
-  <h2>Snake Game</h2>
+  <h2>Welcome to Snake Game</h2>
   <input type="text" id="name-input" placeholder="Enter your name">
-  <input type="color" id="color-picker" value="#00ff00" style="margin-bottom: 10px;">
   <button id="start-button">Start Game</button>
 </div>
+<div id="top-scores">
+  <h3>Top Scores:</h3>
+  <ol id="score-list"></ol>
 </div>
-<div id="top-scores">Top Scores:</div>
 <button id="restart-button" style="display: none">Restart</button>
 <script>
 var canvas = document.getElementById('game');
@@ -79,11 +76,38 @@ var nameInput = document.getElementById('name-input');
 var startButton = document.getElementById('start-button');
 var topScoresElement = document.getElementById('top-scores');
 var restartButton = document.getElementById('restart-button');
+var scoreList = document.getElementById('score-list');
 
 var grid = 16;
 var count = 0;
 var score = 0;
 var topScores = [];
+
+if (!localStorage.getItem('topScores')) {
+  localStorage.setItem('topScores', JSON.stringify([]));
+}
+
+function getTopScores() {
+  var storedScores = JSON.parse(localStorage.getItem('topScores'));
+  topScores = storedScores.sort((a, b) => b - a).slice(0, 5);
+  renderTopScores();
+}
+
+function saveScore() {
+  topScores.push(score);
+  topScores.sort((a, b) => b - a);
+  topScores = topScores.slice(0, 5);
+  localStorage.setItem('topScores', JSON.stringify(topScores));
+}
+
+function renderTopScores() {
+  scoreList.innerHTML = '';
+  topScores.forEach(function (score) {
+    var scoreItem = document.createElement('li');
+    scoreItem.textContent = score;
+    scoreList.appendChild(scoreItem);
+  });
+}
 
 var snake = {
   x: 160,
@@ -93,6 +117,7 @@ var snake = {
   cells: [],
   maxCells: 4
 };
+
 var apple = {
   x: 320,
   y: 320,
@@ -113,11 +138,8 @@ function resizeCanvas() {
 }
 
 function gameOver() {
-  topScores.push(score);
-  topScores.sort((a, b) => b - a);
-  topScores = topScores.slice(0, 5);
-
-  topScoresElement.textContent = 'Top Scores: ' + topScores.join(', ');
+  saveScore();
+  scoreList.innerHTML = '';
   topScoresElement.style.display = 'block';
   restartButton.style.display = 'block';
   canvas.style.display = 'none';
@@ -127,6 +149,7 @@ function gameOver() {
     restartButton.style.display = 'none';
     score = 0;
     topScoresElement.style.display = 'none';
+    topScores = JSON.parse(localStorage.getItem('topScores'));
     snake.x = 160;
     snake.y = 160;
     snake.cells = [];
@@ -140,23 +163,19 @@ function gameOver() {
 }
 
 function startGame() {
-    var name = document.getElementById('name-input').value;
-    if (name.trim() === '') {
-      alert('Please enter your name.');
-    } else {
-      document.getElementById('name-input').style.display = 'none';
-      document.getElementById('start-button').style.display = 'none';
-      document.getElementById('menu').style.display = 'none';
-      document.getElementById('bg-music').play(); // Start playing the music
-      document.getElementById('game').style.display = 'block';
-    }
+  var name = nameInput.value;
+  if (name.trim() === '') {
+    alert('Please enter your name.');
+  } else {
+    nameInput.style.display = 'none';
+    startButton.style.display = 'none';
+    menuElement.style.display = 'none';
+    getTopScores();
+    canvas.style.display = 'block';
   }
+}
 
 startButton.addEventListener('click', startGame);
-var colorPicker = document.getElementById('color-picker');
-    colorPicker.addEventListener('input', function () {
-      snakeColor = colorPicker.value;
-    });
 
 function loop() {
   requestAnimationFrame(loop);
@@ -192,7 +211,7 @@ function loop() {
   context.drawImage(apple.image, apple.x, apple.y, grid, grid);
 
   // draw snake one cell at a time
-  context.fillStyle = snakeColor;
+  context.fillStyle = 'green';
   snake.cells.forEach(function(cell, index) {
     context.fillRect(cell.x, cell.y, grid - 1, grid - 1);
 
